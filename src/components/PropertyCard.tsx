@@ -5,9 +5,11 @@ import type { Property } from "@/data/mockData";
 export default function PropertyCard({
   p,
   index = 0,
+  onPropertyClick,
 }: {
   p: Property;
   index?: number;
+  onPropertyClick?: (property: Property) => void;
 }) {
   return (
     <motion.article
@@ -15,7 +17,8 @@ export default function PropertyCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: (index % 6) * 0.05 }}
-      className="group glow-on-hover bg-card-dark border border-border-dark rounded-2xl overflow-hidden flex flex-col"
+      onClick={() => onPropertyClick?.(p)}
+      className="group glow-on-hover bg-card-dark border border-border-dark rounded-2xl overflow-hidden flex flex-col cursor-pointer transition-all hover:border-brand-gold hover:shadow-lg hover:shadow-brand-gold/20"
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
@@ -48,8 +51,14 @@ export default function PropertyCard({
           {p.bhk} · {p.area} · {p.floor}
         </div>
         <div className="border-t border-border-dark mt-4 pt-4">
-          <button className="w-full py-2.5 rounded-lg border border-border-dark text-sm font-semibold text-foreground/80 hover:bg-brand-gold hover:text-brand-dark hover:border-brand-gold transition">
-            Contact Agent
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onPropertyClick?.(p);
+            }}
+            className="w-full py-2.5 rounded-lg border border-border-dark text-sm font-semibold text-foreground/80 hover:bg-brand-gold hover:text-brand-dark hover:border-brand-gold transition"
+          >
+            View Details
           </button>
         </div>
       </div>

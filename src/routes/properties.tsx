@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import PageBanner from "@/components/PageBanner";
 import PropertyCard from "@/components/PropertyCard";
-import { properties } from "@/data/mockData";
+import PropertyDetailsModal from "@/components/PropertyDetailsModal";
+import { properties, type Property } from "@/data/mockData";
 
 export const Route = createFileRoute("/properties")({
   head: () => ({
@@ -24,9 +25,23 @@ function PropertiesPage() {
   const [bhk, setBhk] = useState<string[]>([]);
   const [budget, setBudget] = useState(50000000);
   const [shown, setShown] = useState(9);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggle = (arr: string[], set: (v: string[]) => void, v: string) =>
     set(arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v]);
+
+  const handlePropertyClick = (property: Property) => {
+    setSelectedProperty(property);
+    setIsModalOpen(true);
+  };
+
+  const activeFiltersCount = type.length + txn.length + bhk.length + (budget < 50000000 ? 1 : 0);
+
+  const handleApplyFilters = () => {
+    setShown(9);
+    document.querySelector('[data-results-section]')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const filtered = useMemo(() => properties.filter(p => {
     if (type.length && !type.includes(p.type)) return false;
@@ -38,7 +53,13 @@ function PropertiesPage() {
 
   const Check = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) => (
     <label className="flex items-center gap-3 cursor-pointer group py-1.5">
-      <span className={`w-4 h-4 rounded border flex items-center justify-center transition ${
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="sr-only"
+      />
+      <span className={`w-4 h-4 rounded border flex items-center justify-center transition pointer-events-none ${
         checked ? "bg-brand-gold border-brand-gold" : "border-border-dark group-hover:border-brand-gold"
       }`}>
         {checked && <span className="text-brand-dark text-[10px] font-black">✓</span>}
@@ -52,7 +73,14 @@ function PropertiesPage() {
       <PageBanner title="All Properties" subtitle="12 verified listings across Nalasopara, Vasai, Virar, Palghar and Boisar." />
       <section className="max-w-7xl mx-auto px-5 lg:px-8 py-16 grid lg:grid-cols-[280px_1fr] gap-8">
         <aside className="bg-card-dark border border-border-dark rounded-2xl p-6 h-fit lg:sticky lg:top-28">
-          <div className="label-mono mb-4">[ FILTERS ]</div>
+          <div className="label-mono mb-4 flex items-center justify-between">
+            <span>[ FILTERS ]</span>
+            {activeFiltersCount > 0 && (
+              <span className="text-xs font-bold bg-brand-gold text-brand-dark px-2 py-1 rounded-full">
+                {activeFiltersCount} Active
+              </span>
+            )}
+          </div>
           <div className="mb-6">
             <div className="font-display font-bold mb-2 text-sm">Property Type</div>
             {TYPES.map(t => <Check key={t} label={t} checked={type.includes(t)} onChange={() => toggle(type, setType, t)} />)}
@@ -76,12 +104,12 @@ function PropertiesPage() {
             className="w-full py-2.5 rounded-lg border border-border-dark text-xs font-mono uppercase tracking-wider hover:border-brand-gold hover:text-brand-gold transition mb-2">
             Reset
           </button>
-          <button className="w-full py-2.5 rounded-lg bg-brand-gold text-brand-dark font-bold text-sm">
-            Apply Filters
+          <button onClick={handleApplyFilters} className="w-full py-2.5 rounded-lg bg-brand-gold text-brand-dark font-bold text-sm hover:bg-brand-gold/90 transition">
+            View Results
           </button>
         </aside>
 
-        <div>
+        <div data-results-section>
           <div className="flex items-center justify-between mb-6 font-mono text-xs text-foreground/60">
             <span>Showing {Math.min(shown, filtered.length)} of {filtered.length}</span>
           </div>
@@ -89,7 +117,7 @@ function PropertiesPage() {
             <div className="text-center py-20 text-foreground/60">No properties match your filters.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filtered.slice(0, shown).map((p, i) => <PropertyCard key={p.id} p={p} index={i} />)}
+              {filtered.slice(0, shown).map((p, i) => <PropertyCard key={p.id} p={p} index={i} onPropertyClick={handlePropertyClick} />)}
             </div>
           )}
           {shown < filtered.length && (
@@ -102,6 +130,11 @@ function PropertiesPage() {
           )}
         </div>
       </section>
+      <PropertyDetailsModal 
+        property={selectedProperty} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </>
   );
 }

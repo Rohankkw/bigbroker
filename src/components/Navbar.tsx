@@ -18,17 +18,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  const handleEMIClick = () => {
-    const section = document.getElementById("emi-calculator");
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-      setOpen(false);
-    } else if (path !== "/") {
-      // If not on home page, navigate to home first
-      window.location.href = "/#emi-calculator";
-    }
-  };
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
@@ -92,12 +81,6 @@ export default function Navbar() {
               </Link>
             );
           })}
-          <button
-            onClick={handleEMIClick}
-            className="relative text-sm font-medium text-foreground/80 hover:text-brand-gold transition cursor-pointer"
-          >
-            EMI Calculator
-          </button>
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -156,12 +139,6 @@ export default function Navbar() {
                 {l.label}
               </Link>
             ))}
-            <button
-              onClick={handleEMIClick}
-              className="font-display text-4xl font-bold hover:text-brand-gold transition"
-            >
-              EMI Calculator
-            </button>
             <a
               href={WHATSAPP}
               target="_blank"

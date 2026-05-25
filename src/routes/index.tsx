@@ -11,7 +11,6 @@ import FeatureShowcase from "@/components/FeatureShowcase";
 import ServiceCard from "@/components/ServiceCard";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ProjectsSection from "@/components/ProjectsSection";
-import EMICalculator from "@/components/EMICalculator";
 import CTABanner from "@/components/CTABanner";
 import { properties, services } from "@/data/mockData";
 
@@ -95,7 +94,6 @@ function Home() {
 
       <TestimonialsSection />
       <ProjectsSection />
-      <EMICalculator />
       <CTABanner />
     </>
   );
